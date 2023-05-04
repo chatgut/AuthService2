@@ -1,0 +1,25 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    environment:
+      DB_URL: jdbc:mysql://auth-DB:3306/demo
+      DB_USER: developer
+      DB_PASS: dev-secret-pw
+    ports:
+      - "8080:8080"
+  mysqlserver:
+    image: 'mysql:latest'
+    volumes:
+      - db_mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_HOST: "%"
+      MYSQL_ROOT_PASSWORD: my-secret-pw
+      MYSQL_DATABASE: auth-DB
+      MYSQL_USER: developer
+      MYSQL_PASSWORD: dev-secret-pw
+      MYSQL_HOST: '%'
+    ports:
+      - "3306:3306"
+volumes:
+  db_mysql:
