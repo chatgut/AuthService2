@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/api")
 public class UserController {
@@ -23,28 +25,38 @@ public class UserController {
 
 
     @PostMapping("/login")
-    void postCredentials(@RequestBody User user){
-        user.setPassword(encoder.encode(user.getPassword()));
-        userRepository.save(user);
+    ResponseEntity<String> postCredentials(@RequestBody User user){
+        if (userRepository.findByUsername(user.getUsername())==null) {
+            user.setPassword(encoder.encode(user.getPassword()));
+            userRepository.save(user);
+            return new ResponseEntity<>("Account created", HttpStatus.OK);
+        }
+        return new ResponseEntity<>("Username is already in use", HttpStatus.CONFLICT);
     }
     @GetMapping("/login")
-    String login(@RequestBody User user){
-        User encodedUser = userRepository.findByUsername(user.getUsername());
-        if (encoder.matches(user.getPassword(),encodedUser.getPassword())){
-            return jwtTokenProvider.generateToken(user);
+    ResponseEntity<String> login(@RequestBody Optional<User> optionalUser){
+        if(optionalUser.isPresent()){
+        User encodedUser = userRepository.findByUsername(optionalUser.get().getUsername());
+            if (encodedUser!=null && encoder.matches(optionalUser.get().getPassword(),encodedUser.getPassword())){
+                return new ResponseEntity<>(jwtTokenProvider.generateToken(optionalUser.get()), HttpStatus.OK);
+            }
         }
-        else
-            return "Wrong login credentials";
+        return new ResponseEntity<>("invalid credentials", HttpStatus.UNAUTHORIZED);
     }
-    @GetMapping("/validate")
-    String validate(@RequestBody String token){
+    @GetMapping("/validate/user")
+    ResponseEntity<String> validate(@RequestBody String token){
         boolean isValid = jwtTokenProvider.validateToken(token);
         if (isValid)
-            return jwtTokenProvider.getUsernameFromToken(token);
+            return new ResponseEntity<>(jwtTokenProvider.getUsernameFromToken(token), HttpStatus.OK);
         else
-            return "token is invalid";
+            return new ResponseEntity<>("invalid token", HttpStatus.UNAUTHORIZED);
     }
-
-
-
+    @GetMapping("/validate/UUID")
+    ResponseEntity<String> UUID(@RequestBody String token){
+        boolean isValid = jwtTokenProvider.validateToken(token);
+        if (isValid)
+            return new ResponseEntity<>(jwtTokenProvider.getUUIDFromToken(token), HttpStatus.OK);
+        else
+            return new ResponseEntity<>("invalid token", HttpStatus.UNAUTHORIZED);
+    }
 }
