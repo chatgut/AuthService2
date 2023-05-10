@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/auth")
 public class UserController {
     BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
     private final UserRepository userRepository;
@@ -42,6 +42,17 @@ public class UserController {
             }
         }
         return new ResponseEntity<>("invalid credentials", HttpStatus.UNAUTHORIZED);
+    }
+    @DeleteMapping("/login")
+    ResponseEntity<String> deleteLogin (@RequestBody Optional<User> optionalUser){
+        if(optionalUser.isPresent()){
+            User encodedUser = userRepository.findByUsername(optionalUser.get().getUsername());
+            if (encodedUser!=null && encoder.matches(optionalUser.get().getPassword(),encodedUser.getPassword())){
+                userRepository.delete(userRepository.findByUsername(optionalUser.get().getUsername()));
+                return new ResponseEntity<>("deleted",HttpStatus.OK);
+            }
+        }
+        return new ResponseEntity<>("no user found",HttpStatus.NO_CONTENT);
     }
     @GetMapping("/validate/user")
     ResponseEntity<String> validate(@RequestBody String token){
