@@ -11,7 +11,7 @@ services:
       DB_USER: developer
       DB_PASS: password
     ports:
-      - "8080:8080"
+      - "8003:8080"
   auth-DB:
     image: 'mysql:latest'
     container_name: auth-DB1

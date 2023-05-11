@@ -15,7 +15,7 @@ spec:
   storageClassName: manual
 
   capacity:
-
+    volumeMode: Filesystem
     storage: 5Gi
 
   accessModes:

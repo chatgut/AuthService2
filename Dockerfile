@@ -11,7 +11,7 @@ FROM eclipse-temurin:20-jre
 RUN adduser --system --group spring
 USER spring:spring
 ENV PORT 8080
-EXPOSE 8080
+EXPOSE 8003
 WORKDIR application
 COPY --from=builder application/dependencies/ ./
 COPY --from=builder application/snapshot-dependencies/ ./
