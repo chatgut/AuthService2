@@ -27,7 +27,7 @@ public class UserController {
     }
 
 
-    @PostMapping("/login")
+    @PostMapping()
     ResponseEntity<String> postCredentials(@RequestBody User user){
         if (userRepository.findByUsername(user.getUsername())==null) {
             user.setPassword(encoder.encode(user.getPassword()));
@@ -36,7 +36,7 @@ public class UserController {
         }
         return new ResponseEntity<>("Username is already in use", HttpStatus.CONFLICT);
     }
-    @GetMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<Object> login(@RequestBody Optional<User> optionalUser) {
         if (optionalUser.isPresent()) {
             User encodedUser = userRepository.findByUsername(optionalUser.get().getUsername());
