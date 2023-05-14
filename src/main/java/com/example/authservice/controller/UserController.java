@@ -3,6 +3,8 @@ package com.example.authservice.controller;
 import com.example.authservice.JwtTokenProvider;
 import com.example.authservice.entity.User;
 import com.example.authservice.repository.UserRepository;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,15 +37,17 @@ public class UserController {
         return new ResponseEntity<>("Username is already in use", HttpStatus.CONFLICT);
     }
     @GetMapping("/login")
-    ResponseEntity<String> login(@RequestBody Optional<User> optionalUser){
-        if(optionalUser.isPresent()){
-        User encodedUser = userRepository.findByUsername(optionalUser.get().getUsername());
-            if (encodedUser!=null && encoder.matches(optionalUser.get().getPassword(),encodedUser.getPassword())){
-                return new ResponseEntity<>(jwtTokenProvider.generateToken(optionalUser.get()), HttpStatus.OK);
+    public ResponseEntity<Object> login(@RequestBody Optional<User> optionalUser) {
+        if (optionalUser.isPresent()) {
+            User encodedUser = userRepository.findByUsername(optionalUser.get().getUsername());
+            if (encodedUser != null && encoder.matches(optionalUser.get().getPassword(), encodedUser.getPassword())) {
+                Token token = new Token(jwtTokenProvider.generateToken(optionalUser.get()));
+                return ResponseEntity.ok().body(token);
             }
         }
         return new ResponseEntity<>("invalid credentials", HttpStatus.UNAUTHORIZED);
     }
+
     @DeleteMapping("/login")
     ResponseEntity<String> deleteLogin (@RequestBody Optional<User> optionalUser){
         if(optionalUser.isPresent()){
@@ -70,5 +74,13 @@ public class UserController {
             return new ResponseEntity<>(jwtTokenProvider.getUUIDFromToken(token), HttpStatus.OK);
         else
             return new ResponseEntity<>("invalid token", HttpStatus.UNAUTHORIZED);
+    }
+}
+@Getter
+@Setter
+class Token{
+    private String token;
+    public Token(String token) {
+        this.token = token;
     }
 }
