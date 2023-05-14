@@ -59,7 +59,7 @@ public class UserController {
         }
         return new ResponseEntity<>("no user found",HttpStatus.NO_CONTENT);
     }
-    @GetMapping("/validate/user")
+    @PostMapping("/validate/user")
     ResponseEntity<String> validate(@RequestBody String token){
         boolean isValid = jwtTokenProvider.validateToken(token);
         if (isValid)
@@ -67,7 +67,7 @@ public class UserController {
         else
             return new ResponseEntity<>("invalid token", HttpStatus.UNAUTHORIZED);
     }
-    @GetMapping("/validate/UUID")
+    @PostMapping("/validate/UUID")
     ResponseEntity<String> UUID(@RequestBody String token){
         boolean isValid = jwtTokenProvider.validateToken(token);
         if (isValid)
