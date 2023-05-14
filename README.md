@@ -1,15 +1,19 @@
 **Docker image requries** mysql database
 ## API Reference
-
+**Create accunt**
 ```http
-  GET /api/auth/login
-  DELETE /api/auth/login
-  POST /api/auth/login
-  
+  POST /api/auth
 ```
-**Requires** json
-
-example 
+**Login**
+```http
+  POST /api/auth/login
+```
+**Delete account**
+```http
+  DELETE /api/auth/login
+```  
+**All of them requires** json of a user
+example
 
         {
             "username":"admin"
@@ -17,8 +21,8 @@ example
         }
 #### Get information from token 
 ```http
-  GET /api/auth/validate/UUID
-  GET /api/auth/validate/user
+  POST /api/auth/validate/UUID
+  POST /api/auth/validate/user
 ```
-**Requires** plaintext of a valid token
+**Both requires** plaintext of a valid token
 
