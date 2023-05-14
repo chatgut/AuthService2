@@ -12,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @CrossOrigin
 @RestController
@@ -41,7 +42,7 @@ public class UserController {
         if (optionalUser.isPresent()) {
             User encodedUser = userRepository.findByUsername(optionalUser.get().getUsername());
             if (encodedUser != null && encoder.matches(optionalUser.get().getPassword(), encodedUser.getPassword())) {
-                Token token = new Token(jwtTokenProvider.generateToken(optionalUser.get()));
+                Token token = new Token(jwtTokenProvider.generateToken(encodedUser));
                 return ResponseEntity.ok().body(token);
             }
         }

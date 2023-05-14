@@ -23,9 +23,4 @@ public class User{
     public User(){
         this.uuid = UUID.randomUUID().toString();
     }
-
-    public User(String username, String password){
-        this.username = username;
-        this.password = password;
-    }
 }
