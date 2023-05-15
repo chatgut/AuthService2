@@ -25,7 +25,7 @@ spec:
             - name: DB_PASS
               value: dev-secret-pw
             - name: DB_URL
-              value: "mysql"
+              value: "mysql:3306/auth-DB"
 
 ---
 apiVersion: v1
@@ -33,11 +33,10 @@ kind: Service
 metadata:
   name: auth-service
 spec:
-  type: NodePort
+  type: LoadBalancer
   selector:
     app: auth
   ports:
     - protocol: TCP
-      port: 8003
-      targetPort: 8003
-      nodePort: 30000
+      port: 8080
+      targetPort: 8080

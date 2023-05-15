@@ -1,6 +1,6 @@
 version: '3.8'
 services:
-  app:
+  auth:
     build:
       context: .
     container_name: auth
@@ -12,6 +12,18 @@ services:
       DB_PASS: password
     ports:
       - "8003:8080"
+  front:
+      build:
+        context: .
+      container_name: front
+      depends_on:
+        - auth-DB
+      environment:
+        DB_URL: auth-DB:3306/auth-DB1
+        DB_USER: developer
+        DB_PASS: password
+      ports:
+        - "8003:8080"
   auth-DB:
     image: 'mysql:latest'
     container_name: auth-DB1
