@@ -19,7 +19,7 @@ public class JwtTokenProvider {
         claims.put("username", user.getUsername());
         claims.put("sub",user.getUuid());
         Date now = new Date();
-        Date expiration = new Date(now.getTime() + jwtConfig.getExpiration() * 1000);
+        Date expiration = new Date(now.getTime() + 60*5 * 1000);
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -27,6 +27,20 @@ public class JwtTokenProvider {
                 .setExpiration(expiration)
                 .setSubject(user.getUuid())
                 .signWith(SignatureAlgorithm.HS512, jwtConfig.getSecret())
+                .compact();
+    }
+    public String generateRefreshToken(User user) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("username", user.getUsername());
+        Date now = new Date();
+        Date expiration = new Date(now.getTime() + 60*60*24 * 1000);
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(expiration)
+                .setSubject(user.getUuid())
+                .signWith(SignatureAlgorithm.HS512, jwtConfig.getRefreshSecret())
                 .compact();
     }
 
@@ -37,6 +51,18 @@ public class JwtTokenProvider {
     public String getUUIDFromToken(String token){
         Claims claims = Jwts.parser().setSigningKey(jwtConfig.getSecret()).parseClaimsJws(token).getBody();
         return (String)claims.get("sub");
+    }
+    public String getUUIDFromRefreshToken(String token){
+        Claims claims = Jwts.parser().setSigningKey(jwtConfig.getRefreshSecret()).parseClaimsJws(token).getBody();
+        return (String)claims.get("sub");
+    }
+    public boolean validateRefreshToken(String token) {
+        try {
+            Jwts.parser().setSigningKey(jwtConfig.getRefreshSecret()).parseClaimsJws(token);
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
     }
 
     public boolean validateToken(String token) {

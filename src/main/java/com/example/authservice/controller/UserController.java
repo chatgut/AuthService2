@@ -42,9 +42,19 @@ public class UserController {
         if (optionalUser.isPresent()) {
             User encodedUser = userRepository.findByUsername(optionalUser.get().getUsername());
             if (encodedUser != null && encoder.matches(optionalUser.get().getPassword(), encodedUser.getPassword())) {
-                Token token = new Token(jwtTokenProvider.generateToken(encodedUser));
+                Token token = new Token(jwtTokenProvider.generateRefreshToken(encodedUser));
                 return ResponseEntity.ok().body(token);
             }
+        }
+        return new ResponseEntity<>("invalid credentials", HttpStatus.UNAUTHORIZED);
+    }
+    @PostMapping("/refresh")
+    public ResponseEntity<Object> refresh(@RequestBody String token){
+        if (jwtTokenProvider.validateRefreshToken(token)) {
+            String uuid = jwtTokenProvider.getUUIDFromRefreshToken(token);
+            User user = userRepository.findByUuid(uuid);
+            Token newToken = new Token(jwtTokenProvider.generateToken(user));
+            return ResponseEntity.ok().body(newToken);
         }
         return new ResponseEntity<>("invalid credentials", HttpStatus.UNAUTHORIZED);
     }
