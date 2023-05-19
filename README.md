@@ -1,4 +1,17 @@
 **Docker image requries** mysql database
+
+
+runs on port 8003 
+
+
+**enviourment variables**
+example
+
+      DB_URL: authservice-mysql:3306/authservice-mysql
+      DB_USER: developer
+      DB_PASS: password
+
+
 ## API Reference
 **Create accunt**
 ```http
