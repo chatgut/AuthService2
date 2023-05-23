@@ -1,27 +1,86 @@
-version: '3.8'
+version: "3.9"
 services:
-  auth:
-    build:
-      context: .
-    container_name: auth
+  imageservice:
+    image: ghcr.io/chatgut/imageservicebov:sha-925024f
     depends_on:
-      - auth-DB
+      - imageservice-mysql
+    ports:
+      - "8001:8001"
     environment:
-      DB_URL: auth-DB/auth-DB1
+      DB_URL: imageservice-mysql:3306/imageservice-mysql
       DB_USER: developer
       DB_PASS: password
+  userservice:
+    image: ghcr.io/chatgut/userservice:1.0
+    depends_on:
+      - userservice-mysql
+    container_name: userservice
+    ports:
+      - "8002:8002"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://userservice-mysql:3306/userservice-mysql
+      MYSQL_USER: developer
+      MYSQL_PASSWORD: password
+  authservice:
+    image: ghcr.io/chatgut/authservice2:latest
+    depends_on:
+      - authservice-mysql
+    container_name: authservice
     ports:
       - "8003:8080"
-  auth-DB:
-    image: 'mysql:latest'
-    container_name: auth-DB1
-    volumes:
-      - dbData:/var/lib/mysql
     environment:
-      MYSQL_DATABASE: auth-DB1
+      DB_URL: authservice-mysql:3306/authservice-mysql
+      DB_USER: developer
+      DB_PASS: password
+  #frontend:
+    #image: chatgut/frontend:version
+    #container_name: frontend
+    #ports:
+     #- "8081:8080"
+  imageservice-mysql:
+    image: "mysql:latest"
+    container_name: imageservice-mysql
+    volumes:
+      - db_image:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_HOST: "%"
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: imageservice-mysql
+      MYSQL_USER: developer
+      MYSQL_PASSWORD: password
+      MYSQL_HOST: '%'
+    ports:
+      - "3305:3305"
+  userservice-mysql:
+    image: "mysql:latest"
+    container_name: userservice-mysql
+    volumes:
+      - db_user:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_HOST: "%"
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: userservice-mysql
+      MYSQL_USER: developer
+      MYSQL_PASSWORD: password
+      MYSQL_HOST: '%'
+    ports:
+      - "3306:3306"
+  authservice-mysql:
+    image: 'mysql:latest'
+    container_name: authservice-mysql
+    volumes:
+      - db_auth:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: authservice-mysql
       MYSQL_USER: developer
       MYSQL_PASSWORD: password
       MYSQL_ROOT_HOST: '%'
       MYSQL_ROOT_PASSWORD: password
+      MYSQL_HOST: '%'
+    ports:
+      - "3307:3307"
+
 volumes:
-  dbData:
+  db_auth:
+  db_user:
+  db_image:
