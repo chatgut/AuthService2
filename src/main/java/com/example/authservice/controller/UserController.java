@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 import java.util.UUID;
 
-@CrossOrigin
+//@CrossOrigin
 @RestController
 @RequestMapping("/api/auth")
 public class UserController {
